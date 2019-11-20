@@ -106,7 +106,7 @@ for (library in libraries) {
 
 process trim {
 
-	publishDir "${params.results}/trim"
+	publishDir "${params.results}/trim", mode: 'rellink'
 	errorStrategy 'retry'
 	maxRetries 1
 	time '24h'
@@ -128,7 +128,7 @@ fastqc_in = Channel.from(fastqc_in).mix(fastqc_trim_in).flatten()
 
 process fastqc {
 
-	publishDir "${params.results}/fastqc"
+	publishDir "${params.results}/fastqc", mode: 'rellink'
 	errorStrategy 'retry'
 	maxRetries 1
 
@@ -156,7 +156,7 @@ process map {
 	maxRetries 1
 	time '48h'
 
-	publishDir "${params.results}/bwa"
+	publishDir "${params.results}/bwa", mode: 'rellink'
 
 	input:
 	set val(library), val(readgroup), file(fastq_1), file(fastq_2) from map_in
@@ -173,7 +173,7 @@ process map {
 
 process merge {
 	
-	publishDir "${params.results}/merge"
+	publishDir "${params.results}/merge", mode: 'rellink'
 	errorStrategy 'retry'
 	maxRetries 1
 	time '5h'
@@ -192,7 +192,7 @@ process merge {
 
 process mark_duplicates {
 
-	publishDir "${params.results}/mark_duplicates"	
+	publishDir "${params.results}/mark_duplicates", mode: 'rellink'
 	errorStrategy 'retry'
 	maxRetries 1
 	time '5h'
@@ -218,7 +218,7 @@ process prune {
 	errorStrategy 'retry'
 	maxRetries 3
 
-	publishDir "${params.results}/prune"
+	publishDir "${params.results}/prune", mode: 'rellink'
 
 	input:
 	set val(library), file(bam), file(bam_index) from prune_in
@@ -252,7 +252,7 @@ process bamtobed {
 
 process macs2 {
 
-	publishDir "${params.results}/macs2"
+	publishDir "${params.results}/macs2", mode: 'rellink'
 	time '5h'
 
 	input:
@@ -272,7 +272,7 @@ process macs2 {
 
 process blacklist_filter_peaks {
 
-	publishDir "${params.results}/macs2"
+	publishDir "${params.results}/macs2", mode: 'rellink'
 	time '1h'
 
 	input:
@@ -291,7 +291,7 @@ process blacklist_filter_peaks {
 process bigwig {
 
 	time '5h'
-	publishDir "${params.results}/bigwig"
+	publishDir "${params.results}/bigwig", mode: 'rellink'
 
 	input:
 	set val(library), file(bedgraph) from bigwig_in
@@ -313,7 +313,7 @@ ataqv_in = ataqv_md_in.combine(ataqv_macs2_in, by: 0)
 
 process ataqv {
 	
-	publishDir "${params.results}/ataqv"
+	publishDir "${params.results}/ataqv", mode: 'rellink'
 	errorStrategy 'retry'
 	maxRetries 1
 	memory '5 GB'
