@@ -1,0 +1,35 @@
+{
+    "libraries": {
+        "119543": {
+            "genome": "rn6",
+            "readgroups": {
+                "119543___2684___L001": {
+                    "1": "/lab/work/porchard/data/fastq/atacseq/119543___2684___L001.1.fastq.gz",
+                    "2": "/lab/work/porchard/data/fastq/atacseq/119543___2684___L001.2.fastq.gz"
+                }
+            }
+        },
+        "119544": {
+            "genome": "rn6",
+            "readgroups": {
+                "119544___2684___L001": {
+                    "1": "/lab/work/porchard/data/fastq/atacseq/119544___2684___L001.1.fastq.gz",
+                    "2": "/lab/work/porchard/data/fastq/atacseq/119544___2684___L001.2.fastq.gz"
+                }
+            }
+        },
+        "119569": {
+            "genome": "rn6",
+            "readgroups": {
+                "119569___2752___L003": {
+                    "1": "/lab/work/porchard/data/fastq/atacseq/119569___2752___L003.1.fastq.gz",
+                    "2": "/lab/work/porchard/data/fastq/atacseq/119569___2752___L003.2.fastq.gz"
+                },
+                "119569___2752___L004": {
+                    "1": "/lab/work/porchard/data/fastq/atacseq/119569___2752___L004.1.fastq.gz",
+                    "2": "/lab/work/porchard/data/fastq/atacseq/119569___2752___L004.2.fastq.gz"
+                }
+            }
+        }
+    }
+}
