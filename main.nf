@@ -36,6 +36,10 @@ make_excluded_regions_arg = {
 	return params.blacklist[genome].collect({'--excluded-region-file ' + it}).join(' ')
 }
 
+has_blacklist = {
+	genome ->
+	params.blacklist.containsKey(genome)
+}
 
 get_blacklists = {
 	genome ->
@@ -280,6 +284,9 @@ process blacklist_filter_peaks {
 
 	output:
 	file("${library}_peaks.broadPeak.noblacklist")
+
+	when:
+	has_blacklist(get_genome(library))
 
 	"""
 	bedtools intersect -a $peaks -b ${get_blacklists(get_genome(library)).join(' ')} -v > ${library}_peaks.broadPeak.noblacklist
