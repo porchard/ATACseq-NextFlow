@@ -12,7 +12,7 @@ Otherwise, you'll need to have the following installed:
 6. samtools
 7. ataqv
 
-I've used this pipeline with NextFlow v. 19.04.1
+This pipeline works with NextFlow versions >= 20.07.1
 
 ## Configuration
 Paths to various generic files (e.g., bwa indices) must be included in the nextflow.config file -- check that file and change paths accordingly. These include:
