@@ -1,18 +1,7 @@
 # NextFlow pipeline for ATAC-seq data
 
 ## Dependencies
-If you have Singularity installed, you can use the config provided here ('Singularity') to build a container with all the dependencies.
-
-Otherwise, you'll need to have the following installed:
-1. cta
-2. bedtools
-3. bwa
-4. picardtools
-5. fastqc
-6. samtools
-7. ataqv
-
-This pipeline works with NextFlow versions >= 20.07.1
+Singularity (v. 3) and NextFlow (>= v. 20.10.0). Containers with the software for each step are pulled from the Sylabs cloud library (https://cloud.sylabs.io/library).
 
 ## Configuration
 Paths to various generic files (e.g., bwa indices) must be included in the nextflow.config file -- check that file and change paths accordingly. These include:
@@ -30,5 +19,5 @@ Lastly, you'll need to include information about each ATAC-seq library, includin
 Once you have all of the above information, you can run the pipeline as follows (in this case, indicating the path to the results on the command line):
 
 ```bash
-nextflow run -with-singularity /path/to/Singularity.simg -with-trace -with-report -with-dag -with-timeline -params-file library-config.json --results /path/to/results /path/to/main.nf
+nextflow run -params-file library-config.json --results /path/to/results /path/to/main.nf
 ```
