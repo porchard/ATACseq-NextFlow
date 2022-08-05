@@ -251,9 +251,9 @@ process bamtobed {
 }
 
 
-process macs2 {
+process macs2_broad {
 
-    publishDir "${params.results}/macs2", mode: 'rellink'
+    publishDir "${params.results}/macs2/broad", mode: 'rellink'
     container 'library://porchard/default/general:20220107'
     time '5h'
 
@@ -271,23 +271,67 @@ process macs2 {
 }
 
 
-process blacklist_filter_peaks {
+process macs2_narrow {
 
-    publishDir "${params.results}/macs2", mode: 'rellink'
+    publishDir "${params.results}/macs2/narrow", mode: 'rellink'
+    container 'library://porchard/default/general:20220107'
+    time '5h'
+
+    input:
+    tuple val(library), path(bed)
+
+    output:
+    tuple val(library), path("${library}_peaks.narrowPeak"), emit: peaks
+    tuple val(library), path("${library}_treat_pileup.bdg"), emit: bedgraph
+    tuple val(library), path("${library}_summits.bed"), emit: summits
+
+    """
+    macs2 callpeak -t $bed --qvalue 0.05 --outdir . --SPMR -f BED -n $library -g ${get_macs2_genome_size(get_genome(library))} --nomodel --shift -37 --seed 762873 --extsize 73 -B --keep-dup all --call-summits
+    """
+
+}
+
+
+process extend_summits {
+
+    publishDir "${params.results}/macs2/narrow", mode: 'rellink'
     container 'library://porchard/default/general:20220107'
     time '1h'
 
     input:
-    tuple val(library), path(peaks)
+    tuple val(library), path(bed)
 
     output:
-    path("${library}_peaks.broadPeak.noblacklist")
+    tuple val(library), path("${library}_summits_extended.bed")
+
+    """
+    extend-summits.py --extension 150 $bed ${get_chrom_sizes(get_genome(library))} > ${library}_summits_extended.bed
+    """
+
+}
+
+
+process blacklist_filter {
+
+    publishDir "${params.results}/macs2/${macs2_subdir}", mode: 'rellink'
+    container 'library://porchard/default/general:20220107'
+    time '1h'
+
+    input:
+    tuple val(library), path(bed)
+
+    output:
+    path("$outfile")
 
     when:
     has_blacklist(get_genome(library))
 
+    script:
+    outfile = bed.getName() + '.noblacklist'
+    macs2_subdir = outfile.contains('broad') ? 'broad' : 'narrow'
+
     """
-    bedtools intersect -a $peaks -b ${get_blacklists(get_genome(library)).join(' ')} -v > ${library}_peaks.broadPeak.noblacklist
+    bedtools intersect -a $bed -b ${get_blacklists(get_genome(library)).join(' ')} -v > $outfile
     """
 
 }
@@ -316,6 +360,7 @@ process bigwig {
     """
 
 }
+
 
 process plot_signal_at_tss {
 
@@ -405,9 +450,15 @@ workflow {
     trimmed = trim(library_readgroup_fq1_fq2)
     (library_readgroup_fq1_fq2.mix(trimmed).map({it -> [it[2], it[3]]}).flatten() | fastqc).map({it -> [it.getName().contains('trimmed') ? 'after-trim' : 'before_trim', it]}).groupTuple() | multiqc
     md_bams = bwa(trimmed).groupTuple() | merge_mapped | mark_duplicates
-    peak_calling = prune(md_bams) | bamtobed | macs2
-    blacklist_filter_peaks(peak_calling.peaks)
-    bigwig(peak_calling.bedgraph).groupTuple() | plot_signal_at_tss
-    ataqv(md_bams.combine(peak_calling.peaks, by: 0)).for_viewer.groupTuple() | ataqv_viewer
+    beds = prune(md_bams) | bamtobed
+
+    narrow_peak_calling = macs2_narrow(beds)
+    extended_summits = extend_summits(narrow_peak_calling.summits)
+    broad_peak_calling = macs2_broad(beds)
+
+    broad_peak_calling.peaks.mix(narrow_peak_calling.peaks).mix(extended_summits) | blacklist_filter
+
+    bigwig(broad_peak_calling.bedgraph).groupTuple() | plot_signal_at_tss
+    ataqv(md_bams.combine(broad_peak_calling.peaks, by: 0)).for_viewer.groupTuple() | ataqv_viewer
 
 }
