@@ -86,6 +86,7 @@ process trim {
     maxRetries 1
     time '24h'
     maxForks 10
+    memory '8 GB'
 
     input:
     tuple val(library), val(readgroup), path(fastq_1), path(fastq_2)
@@ -106,6 +107,8 @@ process fastqc {
     errorStrategy 'retry'
     maxRetries 1
     maxForks 10
+    memory '8 GB'
+    time '6h'
 
     input:
     path(fastq)
@@ -127,7 +130,8 @@ process multiqc {
 
     publishDir "${params.results}/multiqc/${before_or_after_trim}", mode: 'rellink', overwrite: true
     container 'library://porchard/default/general:20220107'
-    time '24h'
+    memory '8 GB'
+    time '6h'
 
     input:
     tuple val(before_or_after_trim), path(x)
@@ -195,6 +199,7 @@ process mark_duplicates {
     maxRetries 1
     time '5h'
     maxForks 15
+    memory '6 GB'
 
     input:
     tuple val(library), path(bam)
@@ -256,6 +261,7 @@ process macs2_broad {
     publishDir "${params.results}/macs2/broad", mode: 'rellink'
     container 'library://porchard/default/general:20220107'
     time '5h'
+    memory '8 GB'
 
     input:
     tuple val(library), path(bed)
@@ -276,6 +282,7 @@ process macs2_narrow {
     publishDir "${params.results}/macs2/narrow", mode: 'rellink'
     container 'library://porchard/default/general:20220107'
     time '5h'
+    memory '8 GB'
 
     input:
     tuple val(library), path(bed)
@@ -297,6 +304,7 @@ process extend_summits {
     publishDir "${params.results}/macs2/narrow", mode: 'rellink'
     container 'library://porchard/default/general:20220107'
     time '1h'
+    memory '8 GB'
 
     input:
     tuple val(library), path(bed)
@@ -342,6 +350,7 @@ process bigwig {
     publishDir "${params.results}/bigwig", mode: 'rellink'
     container 'library://porchard/default/general:20220107'
     time '5h'
+    memory '8 GB'
 
     input:
     tuple val(library), path(bedgraph)
