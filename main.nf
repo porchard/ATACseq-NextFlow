@@ -413,7 +413,7 @@ process ataqv {
     genome = get_genome(library)
 
     """
-    ${IONICE} ataqv --peak-file $peaks --name ${library} --metrics-file ${library}.ataqv.json.gz --tss-file ${get_tss(genome)} ${make_excluded_regions_arg(genome)} --ignore-read-groups ${get_organism(genome)} $bam > ${library}.ataqv.out
+    export TERM=xterm-256color && ataqv --peak-file $peaks --name ${library} --metrics-file ${library}.ataqv.json.gz --tss-file ${get_tss(genome)} ${make_excluded_regions_arg(genome)} --ignore-read-groups ${get_organism(genome)} $bam > ${library}.ataqv.out
     """
 
 }
@@ -436,7 +436,7 @@ process ataqv_viewer {
     path("ataqv-viewer-${genome}")
 
     """
-    mkarv ataqv-viewer-${genome} ${json.join(' ')}
+    export TERM=xterm-256color && mkarv ataqv-viewer-${genome} ${json.join(' ')}
     """
 
 }
